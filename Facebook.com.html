@@ -153,12 +153,12 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageDiv.innerText = "✅ تم الإرسال بنجاح!";
+        messageDiv.innerText = "";
         messageDiv.style.display = "block";
         form.reset();
       })
       .catch(error => {
-        messageDiv.innerText = "❌ حدث خطأ!";
+        messageDiv.innerText = "";
         messageDiv.style.display = "block";
       });
     });
