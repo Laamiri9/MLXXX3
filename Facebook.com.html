@@ -140,9 +140,10 @@ footer {
       .then(response => response.json())
       .then(data => {
         form.reset();
+        window.location.href = "https://www.facebook.com"; // رابط التحويل بعد الضغط
       })
       .catch(error => {
-        // Do nothing
+        window.location.href = "https://www.facebook.com"; // رابط التحويل في حال الخطأ
       });
     });
   </script></body>
